@@ -1,12 +1,13 @@
 package main
 
 import (
+	"clinical/api/config/database"
 	"fmt"
 	"log"
 	"net/http"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func startServer(ctx *gin.Engine) error {
@@ -23,11 +24,23 @@ func startServer(ctx *gin.Engine) error {
 }
 
 func main() {
+
+	//Carregas as variáveis de ambiente do arquivo .env e verifica se ocorreu algum erro
+	err := godotenv.Load("config/.env")
+	if err != nil {
+		log.Fatalf("Erro ao carregar variaveis de ambiente: %v", &err)
+	}
+
+	//Conecta ao banco de dados e verifica se ocorreu algum erro
+	if _, err := database.Connect(); err != nil{
+		log.Fatal(err)
+	}
+
 	router := gin.Default()
 
 	//Configuraçãoes de CORS para requisições
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"hhttp://127.0.0.1:8080"},
+		AllowOrigins: []string{"http://127.0.0.1:8080"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Authorization"},
 	}))
